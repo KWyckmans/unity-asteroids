@@ -19,6 +19,14 @@ public class ShipController : MonoBehaviour
     private Rigidbody2D rb2d;
 	private Renderer rend;
 
+    [SerializeField]
+    public Projectile projectile;
+    public float fireDelta = 0.5f;
+
+    private float nextFire = 0.5f;
+    private Projectile newProjectile;
+    private float myTime = 0.0f;
+
     // Use this for initialization
     void Start()
     {
@@ -46,6 +54,22 @@ public class ShipController : MonoBehaviour
         // position.x = position.x + 0.1f * horizontal * Time.deltaTime;
         // position.y = position.y + 0.1f * vertical * Time.deltaTime;
         // transform.position = position;
+
+        myTime = myTime + Time.deltaTime;
+
+        if(Input.GetButton("Fire1") && myTime > nextFire){
+            nextFire = myTime + fireDelta;
+            Debug.Log("Instantiating object at " + transform.position + " with rotation " + transform.rotation );
+            newProjectile = Instantiate((Object)projectile, transform.position, transform.rotation) as Projectile;
+            Vector3 direction = transform.up;
+            newProjectile.Fire(new Vector2(direction.x, direction.y));
+
+            // Rigidbody2D rb2d = newProjectile.GetComponent<Rigidbody2D>();
+            // rb2d.velocity = transform.TransformDirection(Vector3.forward * 10);
+
+            nextFire = nextFire = myTime;
+            myTime = 0.0f;
+        }
     }
 
     void FixedUpdate()
