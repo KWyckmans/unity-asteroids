@@ -4,26 +4,29 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour  {
 
-	private Rigidbody2D r2d;
+	Rigidbody2D r2d;
 	// Use this for initialization
-	public float speed = 10.0f;
+	public float speed = 300.0f;
+
+	private Vector2 screenBounds;
 
 	void Awake() {
 		r2d = GetComponent<Rigidbody2D>();
-	}
-
-	void Start () {
+		screenBounds = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, Camera.main.transform.position.z));
 		// r2d.velocity = Vector2.up * speed;
+		Debug.Log("Screen bounds: " + screenBounds);
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		
+		if(transform.position.x > screenBounds.x || transform.position.x < -screenBounds.x || transform.position.y > screenBounds.y || transform.position.y < -screenBounds.y){
+			Destroy(gameObject);
+		}	
 	}
 
 	public void Fire(Vector2 direction){
 		Debug.Log("Firing at " + direction);
 		Debug.Log("Test firing at " + Vector2.up * speed);
-		r2d.AddForce(direction);
+		r2d.AddForce(direction * speed);
 	}
 }

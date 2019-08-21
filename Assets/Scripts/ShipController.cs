@@ -4,12 +4,6 @@ using UnityEngine;
 
 public class ShipController : MonoBehaviour
 {
-    KeyCode forward = KeyCode.UpArrow;
-    KeyCode left = KeyCode.LeftArrow;
-    KeyCode right = KeyCode.RightArrow;
-    KeyCode back = KeyCode.DownArrow;
-
-
     [SerializeField]
     private float torque;
     [SerializeField]
@@ -17,39 +11,38 @@ public class ShipController : MonoBehaviour
 
 
     private Rigidbody2D rb2d;
-	private Renderer rend;
+    private Renderer rend;
 
     [SerializeField]
-    public Projectile projectile;
+    public GameObject projectile;
     public float fireDelta = 0.5f;
 
     private float nextFire = 0.5f;
-    private Projectile newProjectile;
     private float myTime = 0.0f;
 
     // Use this for initialization
     void Start()
     {
         rb2d = GetComponent<Rigidbody2D>();
-		rend = GetComponent<Renderer>();
+        rend = GetComponent<Renderer>();
     }
 
     // Update is called once per frame
     void Update()
     {
-		Vector3 pos = Camera.main.WorldToScreenPoint(transform.position);
+        Vector3 pos = Camera.main.WorldToScreenPoint(transform.position);
 
-		pos.x = Mathf.Clamp(pos.x, 0, Screen.width - rend.bounds.size.x);
-		pos.y = Mathf.Clamp(pos.y, 0, Screen.height - rend.bounds.size.y);
+        pos.x = Mathf.Clamp(pos.x, 0, Screen.width - rend.bounds.size.x);
+        pos.y = Mathf.Clamp(pos.y, 0, Screen.height - rend.bounds.size.y);
 
-		transform.position = Camera.main.ScreenToWorldPoint(pos);
+        transform.position = Camera.main.ScreenToWorldPoint(pos);
 
-		// It would also be possible to change the transform, instead of using physics/rigidbody:
-	
-		// Vector3 pos = Camera.main.WorldToViewportPoint(transform.position);
-    	// pos.x = Mathf.Clamp01(pos.x);
-		// pos.y = Mathf.Clamp01(pos.y);
-    	// transform.position = Camera.main.ViewportToWorldPoint(pos);
+        // It would also be possible to change the transform, instead of using physics/rigidbody:
+
+        // Vector3 pos = Camera.main.WorldToViewportPoint(transform.position);
+        // pos.x = Mathf.Clamp01(pos.x);
+        // pos.y = Mathf.Clamp01(pos.y);
+        // transform.position = Camera.main.ViewportToWorldPoint(pos);
         // Vector2 position = transform.position;
         // position.x = position.x + 0.1f * horizontal * Time.deltaTime;
         // position.y = position.y + 0.1f * vertical * Time.deltaTime;
@@ -57,28 +50,28 @@ public class ShipController : MonoBehaviour
 
         myTime = myTime + Time.deltaTime;
 
-        if(Input.GetButton("Fire1") && myTime > nextFire){
+        if (Input.GetKey(KeyCode.Mouse0) && myTime > nextFire)
+        {
             nextFire = myTime + fireDelta;
-            Debug.Log("Instantiating object at " + transform.position + " with rotation " + transform.rotation );
-            newProjectile = Instantiate((Object)projectile, transform.position, transform.rotation) as Projectile;
+            
+            GameObject newProjectile = Instantiate(projectile, transform.position, transform.rotation);
+            Projectile bullet = newProjectile.GetComponent<Projectile>();
+
             Vector3 direction = transform.up;
-            newProjectile.Fire(new Vector2(direction.x, direction.y));
+            bullet.Fire(new Vector2(direction.x, direction.y));
 
-            // Rigidbody2D rb2d = newProjectile.GetComponent<Rigidbody2D>();
-            // rb2d.velocity = transform.TransformDirection(Vector3.forward * 10);
-
-            nextFire = nextFire = myTime;
+            nextFire = nextFire - myTime;
             myTime = 0.0f;
         }
     }
 
     void FixedUpdate()
     {
-		// Sustained input, so should be okay. See https://www.reddit.com/r/Unity3D/comments/7267yi/player_inputs_update_or_fixedupdate/
+        // Sustained input, so should be okay. See https://www.reddit.com/r/Unity3D/comments/7267yi/player_inputs_update_or_fixedupdate/
         float turn = Input.GetAxis("Horizontal");
         float thrust = Input.GetAxis("Vertical");
 
         rb2d.AddTorque(turn * torque * Time.deltaTime);
-		rb2d.AddForce(transform.up * thrust * speed * Time.deltaTime);
+        rb2d.AddForce(transform.up * thrust * speed * Time.deltaTime);
     }
 }
