@@ -9,7 +9,6 @@ public class ShipController : MonoBehaviour
     [SerializeField]
     private float speed;
 
-
     private Rigidbody2D rb2d;
     private SpriteRenderer rend;
 
