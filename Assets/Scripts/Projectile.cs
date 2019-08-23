@@ -25,8 +25,6 @@ public class Projectile : MonoBehaviour  {
 	}
 
 	public void Fire(Vector2 direction){
-		Debug.Log("Firing at " + direction);
-		Debug.Log("Test firing at " + Vector2.up * speed);
 		r2d.AddForce(direction * speed);
 	}
 }

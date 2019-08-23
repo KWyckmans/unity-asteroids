@@ -11,7 +11,7 @@ public class ShipController : MonoBehaviour
 
 
     private Rigidbody2D rb2d;
-    private Renderer rend;
+    private SpriteRenderer rend;
 
     [SerializeField]
     public GameObject projectile;
@@ -24,7 +24,7 @@ public class ShipController : MonoBehaviour
     void Start()
     {
         rb2d = GetComponent<Rigidbody2D>();
-        rend = GetComponent<Renderer>();
+        rend = GetComponent<SpriteRenderer>();
     }
 
     // Update is called once per frame
@@ -34,7 +34,7 @@ public class ShipController : MonoBehaviour
 
         pos.x = Mathf.Clamp(pos.x, 0, Screen.width - rend.bounds.size.x);
         pos.y = Mathf.Clamp(pos.y, 0, Screen.height - rend.bounds.size.y);
-
+        
         transform.position = Camera.main.ScreenToWorldPoint(pos);
 
         // It would also be possible to change the transform, instead of using physics/rigidbody:
@@ -50,11 +50,19 @@ public class ShipController : MonoBehaviour
 
         myTime = myTime + Time.deltaTime;
 
+
         if (Input.GetKey(KeyCode.Mouse0) && myTime > nextFire)
         {
             nextFire = myTime + fireDelta;
-            
-            GameObject newProjectile = Instantiate(projectile, transform.position, transform.rotation);
+
+            float theta = transform.rotation.eulerAngles.z;
+
+            Vector3 rot = Quaternion.AngleAxis(theta, Vector3.forward) * new Vector3(0, transform.localScale.y, 0);
+            Vector3 spawn = rot + transform.localPosition;
+
+            Debug.Log("Spawning bullet at" + spawn + " ship location: " + transform.position + " ship height: " + transform.localScale.y);
+
+            GameObject newProjectile = Instantiate(projectile, spawn, transform.rotation);
             Projectile bullet = newProjectile.GetComponent<Projectile>();
 
             Vector3 direction = transform.up;
@@ -73,5 +81,10 @@ public class ShipController : MonoBehaviour
 
         rb2d.AddTorque(turn * torque * Time.deltaTime);
         rb2d.AddForce(transform.up * thrust * speed * Time.deltaTime);
+    }
+
+    void OnDrawGizmos()
+    {
+
     }
 }
