@@ -34,7 +34,7 @@ public class ShipController : MonoBehaviour
 
         pos.x = Mathf.Clamp(pos.x, 0, Screen.width - rend.bounds.size.x);
         pos.y = Mathf.Clamp(pos.y, 0, Screen.height - rend.bounds.size.y);
-        
+
         transform.position = Camera.main.ScreenToWorldPoint(pos);
 
         // It would also be possible to change the transform, instead of using physics/rigidbody:
@@ -50,27 +50,31 @@ public class ShipController : MonoBehaviour
 
         myTime = myTime + Time.deltaTime;
 
-
         if (Input.GetKey(KeyCode.Mouse0) && myTime > nextFire)
         {
-            nextFire = myTime + fireDelta;
-
-            float theta = transform.rotation.eulerAngles.z;
-
-            Vector3 rot = Quaternion.AngleAxis(theta, Vector3.forward) * new Vector3(0, transform.localScale.y, 0);
-            Vector3 spawn = rot + transform.localPosition;
-
-            Debug.Log("Spawning bullet at" + spawn + " ship location: " + transform.position + " ship height: " + transform.localScale.y);
-
-            GameObject newProjectile = Instantiate(projectile, spawn, transform.rotation);
-            Projectile bullet = newProjectile.GetComponent<Projectile>();
-
-            Vector3 direction = transform.up;
-            bullet.Fire(new Vector2(direction.x, direction.y));
-
-            nextFire = nextFire - myTime;
-            myTime = 0.0f;
+            FireBullet();
         }
+    }
+
+    private void FireBullet()
+    {
+        nextFire = myTime + fireDelta;
+
+        float theta = transform.rotation.eulerAngles.z;
+
+        Vector3 rot = Quaternion.AngleAxis(theta, Vector3.forward) * new Vector3(0, transform.localScale.y, 0);
+        Vector3 spawn = rot + transform.localPosition;
+
+        Debug.Log("Spawning bullet at" + spawn + " ship location: " + transform.position + " ship height: " + transform.localScale.y);
+
+        GameObject newProjectile = Instantiate(projectile, spawn, transform.rotation);
+        Projectile bullet = newProjectile.GetComponent<Projectile>();
+
+        Vector3 direction = transform.up;
+        bullet.Fire(new Vector2(direction.x, direction.y));
+
+        nextFire = nextFire - myTime;
+        myTime = 0.0f;
     }
 
     void FixedUpdate()
