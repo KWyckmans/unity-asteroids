@@ -13,6 +13,9 @@ public class ShipController : MonoBehaviour
     private SpriteRenderer rend;
 
     [SerializeField]
+    private ParticleSystem exhaust;
+
+    [SerializeField]
     public GameObject projectile;
     public float fireDelta = 0.5f;
 
@@ -24,6 +27,10 @@ public class ShipController : MonoBehaviour
     {
         rb2d = GetComponent<Rigidbody2D>();
         rend = GetComponent<SpriteRenderer>();
+        exhaust = GetComponentInChildren<ParticleSystem>();
+        // exhaust = Instantiate(exhaust, new Vector3(transform.position.x,transform.position.y - 0.,0), Quaternion.identity);
+        exhaust.Play();
+        
     }
 
     // Update is called once per frame
@@ -47,6 +54,10 @@ public class ShipController : MonoBehaviour
         // position.y = position.y + 0.1f * vertical * Time.deltaTime;
         // transform.position = position;
 
+
+
+
+        // Debug.Log(exhaust.IsAlive() + " - " + exhaust.isEmitting+ " - " + exhaust.isPlaying + "- " +  exhaust.main.playOnAwake  );
         myTime = myTime + Time.deltaTime;
 
         if (Input.GetKey(KeyCode.Mouse0) && myTime > nextFire)
@@ -61,10 +72,10 @@ public class ShipController : MonoBehaviour
 
         float theta = transform.rotation.eulerAngles.z;
 
-        Vector3 rot = Quaternion.AngleAxis(theta, Vector3.forward) * new Vector3(0, transform.localScale.y, 0);
+        Vector3 rot = Quaternion.AngleAxis(theta, Vector3.forward) * new Vector3(0, transform.localScale.y / 2, 0);
         Vector3 spawn = rot + transform.localPosition;
 
-        Debug.Log("Spawning bullet at" + spawn + " ship location: " + transform.position + " ship height: " + transform.localScale.y);
+        // Debug.Log("Spawning bullet at" + spawn + " ship location: " + transform.position + " ship height: " + transform.localScale.y);
 
         GameObject newProjectile = Instantiate(projectile, spawn, transform.rotation);
         Projectile bullet = newProjectile.GetComponent<Projectile>();
@@ -74,6 +85,7 @@ public class ShipController : MonoBehaviour
 
         nextFire = nextFire - myTime;
         myTime = 0.0f;
+
     }
 
     void FixedUpdate()
@@ -84,6 +96,15 @@ public class ShipController : MonoBehaviour
 
         rb2d.AddTorque(turn * torque * Time.deltaTime);
         rb2d.AddForce(transform.up * thrust * speed * Time.deltaTime);
+
+        var emission = exhaust.emission;
+        if(rb2d.velocity.magnitude > 1 || rb2d.velocity.magnitude < -1){
+            ParticleSystem.EmissionModule module = exhaust.emission;
+            module.enabled = true; 
+        } else {
+            ParticleSystem.EmissionModule module = exhaust.emission;
+            module.enabled = false;
+        }
     }
 
     void OnDrawGizmos()
